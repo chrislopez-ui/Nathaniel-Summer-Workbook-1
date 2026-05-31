@@ -472,28 +472,57 @@ function renderHome(){
   });
 }
 function renderBooks(){
-  const bl=document.getElementById("B-list");bl.innerHTML="";
+  const bl=document.getElementById("B-list");
+  bl.innerHTML="";
   BOOKS.forEach(function(bk){
     const lk=!unlocked(bk.id);
     const dc=mk("div","bdc");
+
+    // Header - built with DOM to avoid quote issues
     const hd=mk("div","bdh");
-    hd.innerHTML='<div class="bnl" style="background:'+bk.col+'18;color:'+bk.col+'">'+bk.id+'</div><div class="bdi"><h3>'+bk.title+'</h3><div class="au">'+bk.author+'</div><div class="dt">'+(lk?"Complete 50% of previous book to unlock":bk.s+" to "+bk.e)+'</div></div>';
+    const bnl=mk("div","bnl");
+    bnl.style.background=bk.col+"18";
+    bnl.style.color=bk.col;
+    bnl.textContent=bk.id;
+    const bdi=mk("div","bdi");
+    const h3=mk("h3");h3.textContent=bk.title;
+    const au=mk("div","au");au.textContent=bk.author;
+    const dt=mk("div","dt");
+    dt.textContent=lk?"Complete 50% of previous book to unlock":bk.s+" to "+bk.e;
+    bdi.appendChild(h3);bdi.appendChild(au);bdi.appendChild(dt);
+    hd.appendChild(bnl);hd.appendChild(bdi);
     dc.appendChild(hd);
+
+    // Chapter list
     const cl=mk("div","cl");
     bk.chs.forEach(function(c,i){
       const isDone=ST.done.includes(c.id);
-      const isNext=!isDone&&!lk;
       const isLk=lk;
-      const st=isDone?"dn":(isNext?"ac":"lk");
+      const st=isDone?"dn":(!isLk?"ac":"lk");
       const row=mk("div","ci"+(isLk?" lk":""));
-      const ic=isDone?"Done":(isNext?"Go":"--");
-      row.innerHTML='<div class="cs '+st+'">'+ic+'</div><div class="cf"><h4>'+c.t+'</h4><p>'+c.sub+'</p></div><span class="cx">'+(isDone?"Done":"+"+c.xp+" XP")+'</span>';
+
+      const cs=mk("div","cs "+st);
+      cs.textContent=isDone?"Done":(!isLk?"Go":"--");
+
+      const cf=mk("div","cf");
+      const ch4=mk("h4");ch4.textContent=c.t;
+      const cp=mk("p");cp.textContent=c.sub;
+      cf.appendChild(ch4);cf.appendChild(cp);
+
+      const cx=mk("span","cx");
+      cx.textContent=isDone?"Done":"+"+c.xp+" XP";
+
+      row.appendChild(cs);row.appendChild(cf);row.appendChild(cx);
+
       if(!isLk){
-        (function(b,ch){row.addEventListener("click",function(){openCh(b,ch);});})(bk.id,c.id);
+        (function(b,cid){
+          row.addEventListener("click",function(){openCh(b,cid);});
+        })(bk.id,c.id);
       }
       cl.appendChild(row);
     });
-    dc.appendChild(cl);bl.appendChild(dc);
+    dc.appendChild(cl);
+    bl.appendChild(dc);
   });
 }
 function openCh(bid,cid){
