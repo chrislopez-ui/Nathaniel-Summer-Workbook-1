@@ -315,7 +315,7 @@ textarea:focus{border-color:var(--org)}
     <div class="pl2" id="P-bl"></div>
     <div class="sh" style="padding:0 16px 10px">&#127942; QUIZ SCORES</div>
     <div class="qh" id="P-qh"></div>
-  </div>
+  
 
   <nav class="nav">
     <button class="nb on" id="N-home" onclick="go('home')">
@@ -329,9 +329,10 @@ textarea:focus{border-color:var(--org)}
     </button>
   </nav>
 </div>
+</div>
 <script>
 
-// Firebase config
+// Firebase config (safe init - works with or without Firebase SDK)
 const firebaseConfig = {
   apiKey: "AIzaSyDjL35Vb-XFAuppk0Y0sWSTcJlNOZ_BuHw",
   authDomain: "nathaniel-summer-workbook.firebaseapp.com",
@@ -341,9 +342,14 @@ const firebaseConfig = {
   messagingSenderId: "984838821882",
   appId: "1:984838821882:web:c3a836bdff904ca2033643"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 const SAVE_KEY = "nathaniel/progress";
+let db = null;
+try {
+  if(typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+  }
+} catch(e) { console.log("Firebase not available, using localStorage only"); }
 
 
 
